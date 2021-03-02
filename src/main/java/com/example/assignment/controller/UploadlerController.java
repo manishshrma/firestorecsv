@@ -1,6 +1,7 @@
 package com.example.assignment.controller;
 
-import com.example.assignment.model.User;
+import com.example.assignment.model.Employee;
+import com.example.assignment.model.Employee;
 import com.example.assignment.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,11 +32,11 @@ public class UploadlerController {
 
             System.out.println("step 1");
             uploadService.saveCsv(file);
-          List<User> csv_from_store=  uploadService.getCsvFirestore();
-           uploadService.trigger_on_Csv(csv_from_store);
-            uploadService.saveCsvtoDB(csv_from_store);
-         List<User> users= uploadService.getCsvfromDB();
-            model.addAttribute("users", users);
+            List<Employee> csv_from_store = uploadService.getCsvFirestore();
+            List<Employee> csvfile = uploadService.trigger_on_Csv(csv_from_store);
+            uploadService.saveCsvtoDB(csvfile);
+            List<Employee> employees = uploadService.getCsvfromDB();
+            model.addAttribute("employees", employees);
             model.addAttribute("status", true);
         }
         return "view/CsvView";

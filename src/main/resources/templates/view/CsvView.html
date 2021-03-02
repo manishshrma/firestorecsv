@@ -26,18 +26,33 @@
             <table class="table table-striped" th:if="${status}">
                 <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
+                    <th scope="col">EmpNo</th>
+                    <th scope="col">EmpName</th>
+                    <th scope="col">Basic</th>
+                    <th scope="col">HRA</th>
+                    <th scope="col">Supp_allow</th>
+                    <th scope="col">CarMaintenance</th>
+                    <th scope="col">Books&periodicals</th>
+                    <th scope="col">PF</th>
+                    <th scope="col">Incometax</th>
+                    <th scope="col">GrossPay</th>
+                    <th scope="col">NetPay</th>
 
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="user : ${users}">
-                    <td th:text="${user.name}">Onions</td>
-                    <td th:text="${user.email}"></td>
-
+                <tr th:each="emp : ${employees}">
+                    <td th:text="${emp.EmployeeNo}">Onions</td>
+                    <td th:text="${emp.EmployeeName}">Onions</td>
+                    <td th:text="${emp.Basic}">Onions</td>
+                    <td th:text="${emp.HRA}">Onions</td>
+                    <td th:text="${emp.SupplementaryAllowance}">Onions</td>
+                    <td th:text="${emp.CarMaintenance}">Onions</td>
+                    <td th:text="${emp.BooksPeriodicals}">Onions</td>
+                    <td th:text="${emp.PF}">Onions</td>
+                    <td th:text="${emp.IncomeTax}">Onions</td>
+                    <td th:text="${emp.GrossPay}">Onions</td>
+                    <td th:text="${emp.Netpay}">Onions</td>
 
                 </tr>
                 </tbody>

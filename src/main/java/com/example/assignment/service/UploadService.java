@@ -1,9 +1,8 @@
 package com.example.assignment.service;
 
-import com.example.assignment.model.User;
+import com.example.assignment.model.Employee;
 import com.example.assignment.repository.UploadRepo;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.ReadChannel;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -22,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -30,27 +30,35 @@ public class UploadService {
 
     @Autowired
     private UploadRepo uploadRepo;
-    private static final String COLLECTION_NAME = "sampleData";
+    private static final String COLLECTION_NAME = "RAW";
 
 
     //saving the csv file to the firestore
     public void saveCsv(MultipartFile file) throws ExecutionException, InterruptedException, IOException {
-        System.out.println("step 3");
+        System.out.println("step 2");
         Firestore dbFirestore = FirestoreClient.getFirestore();
         Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-        ArrayList<User> users = new ArrayList<>();
-        HashMap<String, User> hmap = new HashMap<>();
+        ArrayList<Employee> employees = new ArrayList<>();
+        HashMap<String, Employee> hmap = new HashMap<>();
         Iterable<CSVRecord> records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader);
         ApiFuture<WriteResult> collectionapi = null;
         for (CSVRecord record : records) {
-            User user = new User();
-            user.setId(Long.parseLong(record.get("id")));
-            user.setEmail(record.get("email"));
-            user.setName(record.get("name"));
-            users.add(user);
-            String id = user.getId() + "";
-            System.out.println("11111111111111111111");
-            collectionapi = dbFirestore.collection(COLLECTION_NAME).document(id).set(user);
+            Employee emp = new Employee();
+            System.out.println("step 3");
+            emp.setEmployeeNo(Long.parseLong(record.get(0)));
+            System.out.println("step 4");
+            emp.setEmployeeName(record.get(1));
+            emp.setBasic(Integer.parseInt(record.get(2)));
+            emp.setHRA(Integer.parseInt(record.get("HRA")));
+            emp.setSupplementaryAllowance(Integer.parseInt(record.get(4)));
+            emp.setCarMaintenance(Integer.parseInt(record.get(5)));
+            emp.setBooksPeriodicals(Integer.parseInt(record.get(6)));
+            emp.setPF(Integer.parseInt(record.get("PF")));
+            emp.setIncomeTax(Integer.parseInt(record.get(8)));
+            System.out.println(".........TEST      " + emp.getIncomeTax() + "........... " + emp.getBooksPeriodicals());
+            employees.add(emp);
+            String id = emp.getEmployeeNo() + "";
+            collectionapi = dbFirestore.collection(COLLECTION_NAME).document(id).set(emp);
         }
 
         return;
@@ -58,19 +66,19 @@ public class UploadService {
     }
 
     @GetMapping("/csvstore")
-    public List<User> getCsvFirestore() throws ExecutionException, InterruptedException {
-        System.out.println("step 2");
-        System.out.println(".............................");
-        List<User> myarraylist = new ArrayList<>();
+    public List<Employee> getCsvFirestore() throws ExecutionException, InterruptedException {
+
+        List<Employee> myarraylist = new ArrayList<>();
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<DocumentSnapshot> readChannelApiFuture;
         //getting the csv data,create the list of users, return that list and passs that to db
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = dbFirestore.collection(COLLECTION_NAME).get();
         for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
 
-            User user = doc.toObject(User.class);
-            myarraylist.add(user);
+            Employee emp = doc.toObject(Employee.class);
+            myarraylist.add(emp);
         }
+        System.out.println("printing the list of emp obj");
         System.out.println(myarraylist);
 //        readChannelApiFuture=dbFirestore.collection(COLLECTION_NAME).document().get();
         System.out.println("......................................................");
@@ -80,25 +88,40 @@ public class UploadService {
 
     }
 
-    public void trigger_on_Csv(List<User> mylist)
-    {
+    public List<Employee> trigger_on_Csv(List<Employee> mylist) {
+        //grosspay and netpay
+        List<Employee> myemp = new ArrayList<>();
+        int grosspay = 0;
+        int netpay = 0;
 
+        for (Employee emp : mylist) {
 
+            grosspay = emp.getBasic()
+                    + emp.getHRA()
+                    + emp.getSupplementaryAllowance()
+                    + emp.getCarMaintenance()
+                    + emp.getBooksPeriodicals();
+            emp.setGrossPay(grosspay);
 
+            netpay = grosspay - (emp.getPF() + emp.getIncomeTax());
+            emp.setNetpay(netpay);
+            myemp.add(emp);
+        }
+        return myemp;
     }
 
-    public void saveCsvtoDB(List<User> Modifiedcsv) {
+    public void saveCsvtoDB(List<Employee> Modifiedcsv) {
 
-        for (User user : Modifiedcsv) {
-            uploadRepo.save(user);
+        for (Employee emp : Modifiedcsv) {
+            uploadRepo.save(emp);
         }
     }
 
-    public List<User> getCsvfromDB() {
+    public List<Employee> getCsvfromDB() {
 
-        List<User> myuser = new ArrayList<>();
+        List<Employee> myuser = new ArrayList<>();
 
-        List<User> finalcsv = (List<User>) uploadRepo.findAll();
+        List<Employee> finalcsv = (List<Employee>) uploadRepo.findAll();
 
         System.out.println(finalcsv);
 
