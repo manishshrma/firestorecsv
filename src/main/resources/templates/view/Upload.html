@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org" >
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+    <title>uploadCsv</title>
+</head>
+<body>
+<form method="POST" th:action="@{/uploaded_csv}" enctype="multipart/form-data">
+    <div class="form-group mt-3">
+        <label for="file">Select a CSV file</label>
+        <input type="file" name="file" class="form-control-file" id="file" accept=".csv">
+    </div>
+    <button type="submit" class="btn btn-primary">Import Users</button>
+</form>
+</body>
+</html>
