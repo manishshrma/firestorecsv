@@ -3,8 +3,10 @@ package com.example.assignment.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "myuser")
 public class User {
     @Id
     private long id;

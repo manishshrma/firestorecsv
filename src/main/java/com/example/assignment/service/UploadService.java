@@ -1,6 +1,7 @@
 package com.example.assignment.service;
 
 import com.example.assignment.model.User;
+import com.example.assignment.repository.UploadRepo;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.ReadChannel;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -10,6 +11,7 @@ import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +28,8 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class UploadService {
 
+    @Autowired
+    private UploadRepo uploadRepo;
     private static final String COLLECTION_NAME = "sampleData";
 
 
@@ -45,10 +49,8 @@ public class UploadService {
             user.setName(record.get("name"));
             users.add(user);
             String id = user.getId() + "";
-//            hmap.put(id, user);
-
-            collectionapi = dbFirestore.collection(COLLECTION_NAME).document("testdoc").set(user);
-
+            System.out.println("11111111111111111111");
+            collectionapi = dbFirestore.collection(COLLECTION_NAME).document(id).set(user);
         }
 
         return;
@@ -56,37 +58,51 @@ public class UploadService {
     }
 
     @GetMapping("/csvstore")
-    public void getCsvFirestore() throws ExecutionException, InterruptedException {
+    public List<User> getCsvFirestore() throws ExecutionException, InterruptedException {
         System.out.println("step 2");
         System.out.println(".............................");
-        List<User> myarraylist=new ArrayList<>();
+        List<User> myarraylist = new ArrayList<>();
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<DocumentSnapshot> readChannelApiFuture;
-    //getting the csv data,create the list of users, return that list and passs that to db
-      ApiFuture<QuerySnapshot> querySnapshotApiFuture=  dbFirestore.collection(COLLECTION_NAME).get();
-      for(DocumentSnapshot doc:querySnapshotApiFuture.get().getDocuments()){
+        //getting the csv data,create the list of users, return that list and passs that to db
+        ApiFuture<QuerySnapshot> querySnapshotApiFuture = dbFirestore.collection(COLLECTION_NAME).get();
+        for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
 
-          User user=doc.toObject(User.class);
-          myarraylist.add(user);
-          System.out.println(user);
-      }
+            User user = doc.toObject(User.class);
+            myarraylist.add(user);
+        }
         System.out.println(myarraylist);
-        readChannelApiFuture=dbFirestore.collection(COLLECTION_NAME).document().get();
+//        readChannelApiFuture=dbFirestore.collection(COLLECTION_NAME).document().get();
         System.out.println("......................................................");
 //        System.out.println(readChannelApiFuture.get().get("name"));
+
+        return myarraylist;
+
     }
 
-    public void saveCsvtoDB() {
+    public void trigger_on_Csv(List<User> mylist)
+    {
 
 
 
+    }
+
+    public void saveCsvtoDB(List<User> Modifiedcsv) {
+
+        for (User user : Modifiedcsv) {
+            uploadRepo.save(user);
+        }
     }
 
     public List<User> getCsvfromDB() {
 
-        List<User> myuser=new ArrayList<>();
+        List<User> myuser = new ArrayList<>();
 
-        return myuser;
+        List<User> finalcsv = (List<User>) uploadRepo.findAll();
+
+        System.out.println(finalcsv);
+
+        return finalcsv;
 
     }
 }

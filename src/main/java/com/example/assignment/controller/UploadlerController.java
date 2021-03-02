@@ -31,8 +31,9 @@ public class UploadlerController {
 
             System.out.println("step 1");
             uploadService.saveCsv(file);
-            uploadService.getCsvFirestore();
-            uploadService.saveCsvtoDB();
+          List<User> csv_from_store=  uploadService.getCsvFirestore();
+           uploadService.trigger_on_Csv(csv_from_store);
+            uploadService.saveCsvtoDB(csv_from_store);
          List<User> users= uploadService.getCsvfromDB();
             model.addAttribute("users", users);
             model.addAttribute("status", true);
